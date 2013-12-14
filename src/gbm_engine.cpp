@@ -20,7 +20,6 @@ CGBM::CGBM()
 
     pData = NULL;
     pDist = NULL;
-    pNodeFactory = NULL;
     ptreeTemp = NULL;
 }
 
@@ -30,7 +29,6 @@ CGBM::~CGBM()
     delete[] afInBag;
     delete[] aNodeSearch;
     delete ptreeTemp;
-    delete pNodeFactory;
 }
 
 
@@ -78,13 +76,6 @@ GBMRESULT CGBM::Initialize
     adZ.assign((pData->cRows) * cNumClasses, 0);
     adFadj.assign((pData->cRows) * cNumClasses, 0);
 
-    pNodeFactory = new CNodeFactory();
-    hr = pNodeFactory->Initialize(cDepth);
-    if(GBM_FAILED(hr))
-    {
-        goto Error;
-    }
-    ptreeTemp->Initialize(pNodeFactory);
 
     // array for flagging those observations in the bag
     afInBag = new bool[cTrain];

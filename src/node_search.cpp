@@ -5,6 +5,8 @@
 //
 //------------------------------------------------------------------------------
 #include <cassert>
+#include <memory>
+
 #include "node_search.h"
 
 CNodeSearch::CNodeSearch()
@@ -145,8 +147,7 @@ GBMRESULT CNodeSearch::Set
     double dTotalW,
     unsigned long cTotalN,
     CNodeTerminal *pThisNode,
-    CNode **ppParentPointerToThisNode,
-    CNodeFactory *pNodeFactory
+    CNode **ppParentPointerToThisNode
 )
 {
     GBMRESULT hr = GBM_OK;
@@ -187,7 +188,6 @@ GBMRESULT CNodeSearch::Set
 
     this->pThisNode = pThisNode;
     this->ppParentPointerToThisNode = ppParentPointerToThisNode;
-    this->pNodeFactory = pNodeFactory;
 
     return hr;
 }
@@ -348,38 +348,43 @@ GBMRESULT CNodeSearch::SetupNewNodes
 )
 {
     GBMRESULT hr = GBM_OK;
-    CNodeContinuous *pNewNodeContinuous = NULL;
-    CNodeCategorical *pNewNodeCategorical = NULL;
-    unsigned long i=0;
+    
+    std::auto_ptr<CNodeTerminal> left_node(new CNodeTerminal());
+    std::auto_ptr<CNodeTerminal> right_node(new CNodeTerminal());
+    std::auto_ptr<CNodeTerminal> missing_node(new CNodeTerminal());
 
-    pNewLeftNode    = pNodeFactory->GetNewNodeTerminal();
-    pNewRightNode   = pNodeFactory->GetNewNodeTerminal();
-    pNewMissingNode = pNodeFactory->GetNewNodeTerminal();
 
     // set up a continuous split
     if(cBestVarClasses==0)
     {
-        pNewNodeContinuous = pNodeFactory->GetNewNodeContinuous();
+      CNodeContinuous* pNewNodeContinuous = new CNodeContinuous();
 
-        pNewNodeContinuous->dSplitValue = dBestSplitValue;
-        pNewNodeContinuous->iSplitVar = iBestSplitVar;
-
-        pNewSplitNode = pNewNodeContinuous;
+      pNewNodeContinuous->dSplitValue = dBestSplitValue;
+      pNewNodeContinuous->iSplitVar = iBestSplitVar;
+      
+      pNewSplitNode = pNewNodeContinuous;
     }
     else
     {
-        // get a new categorical node and its branches
-        pNewNodeCategorical = pNodeFactory->GetNewNodeCategorical();
+      // get a new categorical node and its branches
+      std::auto_ptr<CNodeCategorical> cat_node(new CNodeCategorical());
 
-        // set up the categorical split
-        pNewNodeCategorical->iSplitVar = iBestSplitVar;
-        pNewNodeCategorical->aiLeftCategory.resize(1 + (ULONG)dBestSplitValue);
-	std::copy(aiBestCategory.begin(),
-		  aiBestCategory.begin() + pNewNodeCategorical->aiLeftCategory.size(),
-		  pNewNodeCategorical->aiLeftCategory.begin());
-
-        pNewSplitNode = pNewNodeCategorical;
+      // set up the categorical split
+      cat_node->iSplitVar = iBestSplitVar;
+      cat_node->aiLeftCategory.resize(1 + (ULONG)dBestSplitValue);
+      std::copy(aiBestCategory.begin(),
+		aiBestCategory.begin() + cat_node->aiLeftCategory.size(),
+		cat_node->aiLeftCategory.begin());
+      
+      pNewSplitNode = cat_node.release();
     }
+
+    // if we get this far we're OK with allocation
+    // this is a horrible kludge
+
+    pNewLeftNode = left_node.release();
+    pNewRightNode = right_node.release();
+    pNewMissingNode = missing_node.release();
 
     *ppParentPointerToThisNode = pNewSplitNode;
 
@@ -400,7 +405,8 @@ GBMRESULT CNodeSearch::SetupNewNodes
     pNewMissingNode->dTrainW     = dBestMissingTotalW;
     pNewMissingNode->cN          = cBestMissingN;
 
-    pThisNode->RecycleSelf(pNodeFactory);
+    delete pThisNode;
+    pThisNode = NULL;
 
     return hr;
 }

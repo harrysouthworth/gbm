@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <vector>
 #include "dataset.h"
-#include "node_factory.h"
 #include "node_search.h"
 
 
@@ -33,7 +32,6 @@ public:
     CCARTTree();
     ~CCARTTree();
 
-    GBMRESULT Initialize(CNodeFactory *pNodeFactory);
     GBMRESULT grow(double *adZ, 
                  CDataset *pData, 
                  double *adAlgW,
@@ -120,7 +118,6 @@ private:
     double dTotalW;
     signed char schWhichNode;
 
-    CNodeFactory *pNodeFactory;
     CNodeNonterminal *pNewSplitNode;
     CNodeTerminal *pNewLeftNode;
     CNodeTerminal *pNewRightNode;

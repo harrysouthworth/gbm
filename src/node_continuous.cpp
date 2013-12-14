@@ -1,7 +1,6 @@
 //  GBM by Greg Ridgeway  Copyright (C) 2003
 
 #include "node_continuous.h"
-#include "node_factory.h"
 
 CNodeContinuous::CNodeContinuous()
 {
@@ -106,19 +105,6 @@ signed char CNodeContinuous::WhichNode
 
     return ReturnValue;
 }
-
-
-
-GBMRESULT CNodeContinuous::RecycleSelf
-(
-    CNodeFactory *pNodeFactory
-)
-{
-    GBMRESULT hr = GBM_OK;
-    pNodeFactory->RecycleNode(this);
-    return hr;
-};
-
 
 
 GBMRESULT CNodeContinuous::TransferTreeToRList

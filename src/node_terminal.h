@@ -57,7 +57,6 @@ public:
                     double &dFadj);
 
     GBMRESULT GetVarRelativeInfluence(double *adRelInf);
-    GBMRESULT RecycleSelf(CNodeFactory *pNodeFactory);
 };
 
 typedef CNodeTerminal *PCNodeTerminal;

@@ -14,7 +14,9 @@ CNodeNonterminal::CNodeNonterminal()
 
 CNodeNonterminal::~CNodeNonterminal()
 {
-
+  delete pLeftNode;
+  delete pRightNode;
+  delete pMissingNode;
 }
 
 

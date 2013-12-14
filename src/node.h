@@ -22,8 +22,6 @@
 #include "buildinfo.h"
 
 
-class CNodeFactory;
-
 using namespace std;
 
 typedef vector<char> VEC_CATEGORIES;
@@ -95,8 +93,7 @@ public:
 
     double TotalError();
     virtual GBMRESULT GetVarRelativeInfluence(double *adRelInf);
-    virtual GBMRESULT RecycleSelf(CNodeFactory *pNodeFactory) = 0;
-
+    
     double dPrediction;
     double dTrainW;   // total training weight in node
     unsigned long cN; // number of training observations in node

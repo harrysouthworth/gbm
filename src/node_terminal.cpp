@@ -6,7 +6,6 @@
 //------------------------------------------------------------------------------
 
 #include "node_terminal.h"
-#include "node_factory.h"
 
 CNodeTerminal::CNodeTerminal()
 {
@@ -96,16 +95,6 @@ GBMRESULT CNodeTerminal::GetVarRelativeInfluence
 {
     return GBM_OK;
 }
-
-
-GBMRESULT CNodeTerminal::RecycleSelf
-(
-    CNodeFactory *pNodeFactory
-)
-{
-    pNodeFactory->RecycleNode(this);
-    return GBM_OK;
-};
 
 
 

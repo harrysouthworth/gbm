@@ -4,46 +4,23 @@
 CCARTTree::CCARTTree()
 {
     pRootNode = NULL;
-    pNodeFactory = NULL;
     dShrink = 1.0;
 }
 
 
 CCARTTree::~CCARTTree()
 {
-    if(pRootNode != NULL)
-    {
-        pRootNode->RecycleSelf(pNodeFactory);
-    }
+  delete pRootNode;
 }
 
 
-GBMRESULT CCARTTree::Initialize
-(
-    CNodeFactory *pNodeFactory
-)
-{
-    GBMRESULT hr = GBM_OK;
-
-    this->pNodeFactory = pNodeFactory;
-
-    return hr;
-}
 
     
 GBMRESULT CCARTTree::Reset()
 {
     GBMRESULT hr = GBM_OK;
 
-    if(pRootNode != NULL)
-    {
-        // delete the old tree and start over
-        hr = pRootNode->RecycleSelf(pNodeFactory);
-    }
-    if(GBM_FAILED(hr))
-    {
-        goto Error;
-    }
+    delete pRootNode;
 
     iBestNode = 0;
     dBestNodeImprovement = 0.0;
@@ -118,7 +95,7 @@ GBMRESULT CCARTTree::grow
     }
     dError = dSumZ2-dSumZ*dSumZ/dTotalW;
 
-    pInitialRootNode = pNodeFactory->GetNewNodeTerminal();
+    pInitialRootNode = new CNodeTerminal();
     pInitialRootNode->dPrediction = dSumZ/dTotalW;
     pInitialRootNode->dTrainW = dTotalW;
     vecpTermNodes.resize(2*cMaxDepth + 1,NULL); // accounts for missing nodes
@@ -127,8 +104,7 @@ GBMRESULT CCARTTree::grow
 
     aNodeSearch[0].Set(dSumZ,dTotalW,nBagged,
                        pInitialRootNode,
-                       &pRootNode,
-                       pNodeFactory);
+                       &pRootNode);
 
     // build the tree structure
     #ifdef NOISY_DEBUG
@@ -196,23 +172,20 @@ GBMRESULT CCARTTree::grow
                                           aNodeSearch[iBestNode].dBestRightTotalW,
                                           aNodeSearch[iBestNode].cBestRightN,
                                           pNewRightNode,
-                                          &(pNewSplitNode->pRightNode),
-                                          pNodeFactory);
+                                          &(pNewSplitNode->pRightNode));
         // set up the node search for the new missing node
         aNodeSearch[cTerminalNodes-1].Set(aNodeSearch[iBestNode].dBestMissingSumZ,
                                           aNodeSearch[iBestNode].dBestMissingTotalW,
                                           aNodeSearch[iBestNode].cBestMissingN,
                                           pNewMissingNode,
-                                          &(pNewSplitNode->pMissingNode),
-                                          pNodeFactory);
+                                          &(pNewSplitNode->pMissingNode));
         // set up the node search for the new left node
         // must be done second since we need info for right node first
         aNodeSearch[iBestNode].Set(aNodeSearch[iBestNode].dBestLeftSumZ,
                                    aNodeSearch[iBestNode].dBestLeftTotalW,
                                    aNodeSearch[iBestNode].cBestLeftN,
                                    pNewLeftNode,
-                                   &(pNewSplitNode->pLeftNode),
-                                   pNodeFactory);
+                                   &(pNewSplitNode->pLeftNode));
 
     } // end tree growing
 

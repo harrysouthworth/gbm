@@ -22,7 +22,6 @@
 #include "distribution.h"
 #include "tree.h"
 #include "dataset.h"
-#include "node_factory.h"
 
 using namespace std;
 
@@ -81,7 +80,6 @@ public:
     CDataset *pData;            // the data
     CDistribution *pDist;       // the distribution
     bool fInitialized;          // indicates whether the GBM has been initialized
-    CNodeFactory *pNodeFactory;
 
     // these objects are for the tree growing
     // allocate them once here for all trees to use

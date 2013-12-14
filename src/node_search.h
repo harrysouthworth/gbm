@@ -19,7 +19,9 @@
 
 #include <vector>
 
-#include "node_factory.h"
+#include "node_terminal.h"
+#include "node_continuous.h"
+#include "node_categorical.h"
 #include "dataset.h"
 
 using namespace std;
@@ -41,8 +43,7 @@ public:
                 double dTotalW,
                 unsigned long cTotalN,
                 CNodeTerminal *pThisNode,
-                CNode **ppParentPointerToThisNode,
-                CNodeFactory *pNodeFactory);
+                CNode **ppParentPointerToThisNode);
     GBMRESULT ResetForNewVar(unsigned long iWhichVar,
                            long cVarClasses);
 
@@ -119,7 +120,6 @@ private:
 
     CNodeTerminal *pThisNode;
     CNode **ppParentPointerToThisNode;
-    CNodeFactory *pNodeFactory;
 };
 
 typedef CNodeSearch *PCNodeSearch;

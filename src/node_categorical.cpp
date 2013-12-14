@@ -1,7 +1,6 @@
 //  GBM by Greg Ridgeway  Copyright (C) 2003
 
 #include "node_categorical.h"
-#include "node_factory.h"
 
 
 CNodeCategorical::~CNodeCategorical()
@@ -114,17 +113,6 @@ signed char CNodeCategorical::WhichNode
 }
 
 
-
-
-GBMRESULT CNodeCategorical::RecycleSelf
-(
-    CNodeFactory *pNodeFactory
-)
-{
-    GBMRESULT hr = GBM_OK;
-    hr = pNodeFactory->RecycleNode(this);
-    return hr;
-};
 
 
 

@@ -49,8 +49,6 @@ public:
                           unsigned long cCol,
                           unsigned long iRow);
 
-    GBMRESULT RecycleSelf(CNodeFactory *pNodeFactory);
-
     double dSplitValue;
 };
 
