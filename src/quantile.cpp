@@ -1,12 +1,75 @@
 //  GBM by Greg Ridgeway  Copyright (C) 2003
 
-#include "quantile.h"
+#include <limits>
+#include <cassert>
 
+#include "quantile.h"
 
 CQuantile::~CQuantile()
 {
 
 }
+
+struct Pair {
+    double w;
+    double x;
+    
+    Pair(double w = 0.0, double x = 0.0) : w(w),x(x) {}
+
+    bool operator<(const Pair& o) const { return x < o.x; }
+};
+
+/* 
+ * Leonid Boytsov & Anna Belova: added the weighted quantile
+ * Using the following approach: 
+ * http://stats.stackexchange.com/questions/13169/defining-quantiles-over-a-weighted-sample/13223#13223
+ */
+
+static double GetWeightedQuantile(
+    double dAlpha, 
+    double* dVal, 
+    double* dWeight, 
+    unsigned long cLength
+) {
+    if (!cLength) return numeric_limits<double>::quiet_NaN(); // One shouldn't call with empty arrays, though
+    vector<Pair>  data(cLength);
+
+    double        total = 0.0;
+
+    for (unsigned long i = 0; i < cLength; ++i) {
+        total += dWeight[i];
+        data[i] = Pair(dWeight[i], dVal[i]);
+    }
+    total *= (cLength - 1);
+
+    sort(data.begin(), data.end());
+    double dQuantPoint = total * dAlpha;
+
+    if (dQuantPoint <= data[0].w) return data[0].x;
+    if (dQuantPoint >= total) return data[cLength - 1].x;
+
+    double sum = 0;
+
+    for (unsigned long k = 1; k < cLength; ++k) {
+        double x1 = data[k-1].x, x2 = data[k].x;
+        double w1 = data[k-1].w, w2 = data[k].w;
+        double sumNext = sum + (cLength - k) * w1 + k * w2;
+    
+        assert(dQuantPoint);
+
+        if (sum <= dQuantPoint && dQuantPoint <= sumNext) {
+           assert(sumNext > sum);
+           return x1 + (x2 - x1) *  (dQuantPoint - sum) / (sumNext - sum);
+        }
+        sum = sumNext;
+    }
+
+    return data[cLength - 1].x;
+}
+
+
+
+
 
 
 GBMRESULT CQuantile::ComputeWorkingResponse
@@ -19,7 +82,7 @@ GBMRESULT CQuantile::ComputeWorkingResponse
     double *adWeight,
     bool *afInBag,
     unsigned long nTrain,
-    int cIdxOff
+	int cIdxOff
 )
 {
     unsigned long i = 0;
@@ -45,6 +108,7 @@ GBMRESULT CQuantile::ComputeWorkingResponse
 
 
 // DEBUG: needs weighted quantile
+// Leonid Boytsov & Anna Belova: added the weighted quantile
 GBMRESULT CQuantile::InitF
 (
     double *adY,
@@ -70,8 +134,12 @@ GBMRESULT CQuantile::InitF
         dInitF = *max_element(vecd.begin(), vecd.end());
     } else
     {
+#if 0
         nth_element(vecd.begin(), vecd.begin() + int(cLength*dAlpha), vecd.end());
         dInitF = *(vecd.begin() + int(cLength*dAlpha));
+#else
+        dInitF = GetWeightedQuantile(dAlpha, &vecd[0], adWeight, cLength);
+#endif
     }
     
     return GBM_OK;
@@ -129,6 +197,7 @@ double CQuantile::Deviance
 
 
 // DEBUG: needs weighted quantile
+// Leonid Boytsov & Anna Belova: added the weighted quantile
 GBMRESULT CQuantile::FitBestConstant
 (
     double *adY,
@@ -154,6 +223,7 @@ GBMRESULT CQuantile::FitBestConstant
     unsigned long iVecd = 0;
     double dOffset;
     
+    vecw.resize(nTrain);
     vecd.resize(nTrain); // should already be this size from InitF
     for(iNode=0; iNode<cTermNodes; iNode++)
     {
@@ -167,6 +237,7 @@ GBMRESULT CQuantile::FitBestConstant
                     dOffset = (adOffset==NULL) ? 0.0 : adOffset[iObs];
 
                     vecd[iVecd] = adY[iObs] - dOffset - adF[iObs];
+                    vecw[iVecd] = adW[iObs];
                     iVecd++;
                 }
             }
@@ -177,11 +248,15 @@ GBMRESULT CQuantile::FitBestConstant
                     *max_element(vecd.begin(), vecd.begin()+iVecd);
             } else
             {
+#if 0
                 nth_element(vecd.begin(), 
                             vecd.begin() + int(iVecd*dAlpha), 
                             vecd.begin() + int(iVecd));
                 vecpTermNodes[iNode]->dPrediction = 
                     *(vecd.begin() + int(iVecd*dAlpha));
+#else
+                vecpTermNodes[iNode]->dPrediction = GetWeightedQuantile(dAlpha, &vecd[0], &vecw[0], iVecd);
+#endif
             }
          }
     }
