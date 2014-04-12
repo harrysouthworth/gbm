@@ -89,6 +89,7 @@ public:
 
 private:
     vector<double> vecd;
+    vector<double> vecw;
     double dAlpha;
 };
 
