@@ -35,7 +35,7 @@ public:
     ~CGBM();
     GBMRESULT Initialize(CDataset *pData,
                          CDistribution *pDist,
-                         double dLambda,
+                         double *dLambda,
                          unsigned long nTrain,
                          unsigned long cFeatures,
                          double dBagFraction,
@@ -50,7 +50,8 @@ public:
                     double &dOOBagImprove,
                     int &cNodes,
 					int cNumClasses,
-					int cClassIdx);
+					int cClassIdx,
+                    int iT);
     GBMRESULT TransferTreeToRList(int *aiSplitVar,
                                 double *adSplitPoint,
                                 int *aiLeftNode,
@@ -60,7 +61,8 @@ public:
                                 double *adWeight,
                                 double *adPred,
                                 VEC_VEC_CATEGORIES &vecSplitCodes,
-                                int cCatSplitsOld);
+                                int cCatSplitsOld,
+                                double currentShrinkage);
     GBMRESULT Predict(unsigned long iVar,
                     unsigned long cTrees,
                     double *adF,
@@ -94,14 +96,16 @@ public:
     std::vector<double> adZ;
     std::vector<double> adFadj;
 
-    double dLambda;
+    double *dLambda;
     unsigned long cTrain;
     unsigned long cValid;
     unsigned long cFeatures;
     unsigned long cTotalInBag;
     double dBagFraction;
+    double currentShrinkage;
     unsigned long cDepth;
     unsigned long cMinObsInNode;
+    int  iT;
     int  cGroups;
 };
 

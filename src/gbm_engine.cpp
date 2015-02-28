@@ -12,12 +12,14 @@ CGBM::CGBM()
     cDepth = 0;
     cMinObsInNode = 0;
     dBagFraction = 0.0;
-    dLambda = 0.0;
+    // dLambda = 0.0;
+    double *dLambda;
     fInitialized = false;
     cTotalInBag = 0;
     cTrain = 0;
     cFeatures = 0;
     cValid = 0;
+    iT = 0;
 
     pData = NULL;
     pDist = NULL;
@@ -39,7 +41,7 @@ GBMRESULT CGBM::Initialize
 (
     CDataset *pData,
     CDistribution *pDist,
-    double dLambda,
+    double *dLambda,
     unsigned long cTrain,
     unsigned long cFeatures,
     double dBagFraction,
@@ -183,7 +185,8 @@ GBMRESULT CGBM::iterate
     double &dOOBagImprove,
     int &cNodes,
     int cNumClasses,
-    int cClassIdx
+    int cClassIdx,
+    int iT
 )
 {
     GBMRESULT hr = GBM_OK;
@@ -304,7 +307,7 @@ GBMRESULT CGBM::iterate
 #endif
 
     hr = ptreeTemp->grow(&(adZ[cIdxOff]), pData, &(pData->adWeight[cIdxOff]),
-                         &(adFadj[cIdxOff]), cTrain, cFeatures, cTotalInBag, dLambda, cDepth,
+                         &(adFadj[cIdxOff]), cTrain, cFeatures, cTotalInBag, dLambda[iT], cDepth,
                          cMinObsInNode, afInBag, aiNodeAssign, aNodeSearch,
                          vecpTermNodes);
 
@@ -356,7 +359,7 @@ GBMRESULT CGBM::iterate
     {
         goto Error;
     }
-    ptreeTemp->SetShrinkage(dLambda);
+    ptreeTemp->SetShrinkage(dLambda[iT]);
 
     if (cClassIdx == (cNumClasses - 1))
     {
@@ -367,7 +370,7 @@ GBMRESULT CGBM::iterate
                                               &adF[0],
                                               &adFadj[0],
                                               afInBag,
-                                              dLambda,
+                                              dLambda[iT],
                                               cTrain);
     }
 
@@ -375,7 +378,7 @@ GBMRESULT CGBM::iterate
     for(i=0; i < cTrain; i++)
     {
         int iIdx = i + cIdxOff;
-        adF[iIdx] += dLambda * adFadj[iIdx];
+        adF[iIdx] += dLambda[iT] * adFadj[iIdx];
     }
 
     dTrainError = pDist->Deviance(pData->adY,
@@ -434,7 +437,8 @@ GBMRESULT CGBM::TransferTreeToRList
     double *adWeight,
     double *adPred,
     VEC_VEC_CATEGORIES &vecSplitCodes,
-    int cCatSplitsOld
+    int cCatSplitsOld,
+    double currentShrinkage
 )
 {
     GBMRESULT hr = GBM_OK;
@@ -450,7 +454,7 @@ GBMRESULT CGBM::TransferTreeToRList
                                         adPred,
                                         vecSplitCodes,
                                         cCatSplitsOld,
-                                        dLambda);
+                                        currentShrinkage);
 
     return hr;
 }

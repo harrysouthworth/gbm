@@ -17,6 +17,7 @@ gbm <- function(formula = formula(data),
                 interaction.depth = 1,
                 n.minobsinnode = 10,
                 shrinkage = 0.001,
+                shrinkage.decay = 0,
                 bag.fraction = 0.5,
                 train.fraction = 1.0,
                 mFeatures = NULL,
@@ -135,6 +136,15 @@ gbm <- function(formula = formula(data),
       } else {
         mFeatures <- max(mFeatures, 1)
       }
+    }
+
+    # Determine shrinkage vector
+    if (length(shrinkage) > 1 && length(shrinkage) != n.trees){
+      stop("Shrinkage as a vector must have length n.trees.")
+    } else if (length(shrinkage) == 1){
+      # Determine shrinkage vector using shrinkage.decay
+      shrinkage <- sapply(1:n.trees,
+                          function(i) shrinkage[1] / (1+(i-1)*shrinkage.decay))
     }
 
    cv.error <- NULL

@@ -105,7 +105,7 @@ SEXP gbm
                    INTEGER(rcDepth)[0],
                    INTEGER(rcMinObsInNode)[0],
                    INTEGER(rcNumClasses)[0],
-                   REAL(rdShrinkage)[0],
+                   REAL(rdShrinkage),
                    REAL(rdBagFraction)[0],
                    INTEGER(rcTrain)[0],
                    INTEGER(rcFeatures)[0],
@@ -124,7 +124,7 @@ SEXP gbm
     // initialize the GBM
     hr = pGBM->Initialize(pData,
                           pDist,
-                          REAL(rdShrinkage)[0],
+                          REAL(rdShrinkage),
                           cTrain,
                           cFeatures,
                           REAL(rdBagFraction)[0],
@@ -214,7 +214,7 @@ SEXP gbm
         {
             hr = pGBM->iterate(REAL(radF),
                                dTrainError,dValidError,dOOBagImprove,
-                               cNodes, cNumClasses, iK);
+                               cNodes, cNumClasses, iK, iT);
 
             if(GBM_FAILED(hr))
             {
@@ -260,7 +260,8 @@ SEXP gbm
                                    REAL(rdErrorReduction),
                                    REAL(rdWeight),
                                    REAL(rdPred),
-                                   INTEGER(rcCatSplitsOld)[0]);
+                                   INTEGER(rcCatSplitsOld)[0],
+                                   REAL(rdShrinkage)[iT]);
         } // Close for iK
 
         // print the information
@@ -276,7 +277,7 @@ SEXP gbm
                        iT+1+INTEGER(rcTreesOld)[0],
                        REAL(radTrainError)[iT],
                        REAL(radValidError)[iT],
-                       REAL(rdShrinkage)[0],
+                       REAL(rdShrinkage)[iT],
                        REAL(radOOBagImprove)[iT]);
             }
         }

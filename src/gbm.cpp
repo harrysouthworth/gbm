@@ -48,7 +48,7 @@ unsigned long gbm_setup
     int cDepth,
     int cMinObsInNode,
     int cNumClasses,
-    double dShrinkage,
+    double *dShrinkage,
     double dBagFraction,
     int cTrain,
     int cFeatures,
@@ -163,7 +163,8 @@ GBMRESULT gbm_transfer_to_R
     double *adErrorReduction,
     double *adWeight,
     double *adPred,
-    int cCatSplitsOld
+    int cCatSplitsOld,
+    double currentShrinkage
 )
 {
     GBMRESULT hr = GBM_OK;
@@ -178,7 +179,8 @@ GBMRESULT gbm_transfer_to_R
                                    adWeight,
                                    adPred,
                                    vecSplitCodes,
-                                   cCatSplitsOld);
+                                   cCatSplitsOld,
+                                   currentShrinkage);
     if(GBM_FAILED(hr)) goto Error;
 
 Cleanup:
