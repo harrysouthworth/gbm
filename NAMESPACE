@@ -11,3 +11,10 @@ importFrom(splines, ns, splineDesign)
 # xyplot is used, which means several functions internal
 # to lattice will also be used. Import the lot.
 import(lattice)
+
+import(parallel)
+
+S3method(plot, gbm)
+S3method(predict, gbm)
+S3method(print, gbm)
+S3method(summary, gbm)
