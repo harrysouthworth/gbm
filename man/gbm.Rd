@@ -21,7 +21,7 @@ gbm(formula = formula(data),
     mFeatures = NULL,
     cv.folds=0,
     keep.data = TRUE,
-    verbose = "CV",
+    verbose = FALSE,
     class.stratify.cv=NULL,
     n.cores = NULL)
 

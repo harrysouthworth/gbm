@@ -22,13 +22,13 @@ gbm <- function(formula = formula(data),
                 mFeatures = NULL,
                 cv.folds=0,
                 keep.data = TRUE,
-                verbose = 'CV',
+                verbose = TRUE,
                 class.stratify.cv=NULL,
                 n.cores=NULL){
    theCall <- match.call()
 
 
-   lVerbose <- if (!is.logical(verbose)) { FALSE }
+   lVerbose <- if (!is.logical(verbose)) { warning('the verbose parameter should be a boolean'); FALSE }
                else { verbose }
 
    mf <- match.call(expand.dots = FALSE)
