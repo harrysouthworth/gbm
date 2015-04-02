@@ -1,5 +1,4 @@
-# print, show and summary functions for gbm
-
+# print and summary functions for gbm
 
 #' Print model summary
 #' 
@@ -86,6 +85,10 @@ print.gbm <- function(x, ... ){
 
    #############################################################################
 
+   if (is.null(x$cv.fitted)) {
+       return(invisible())
+   }
+   
    d <- reconstructGBMdata(x)
    if (x$distribution$name == "multinomial"){
        n.class <- x$num.classes
@@ -144,8 +147,6 @@ print.gbm <- function(x, ... ){
            cat("Cross-validation robust pseudo R-squared: ", signif(R2, 3), "\n")
        }
    }
-
-   #############################################################################
 
    invisible()
 }

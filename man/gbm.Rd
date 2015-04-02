@@ -7,11 +7,18 @@
 \title{Generalized Boosted Regression Modeling}
 \usage{
 gbm(formula = formula(data), distribution = "bernoulli", data = list(),
-  weights, subset = NULL, offset = NULL, var.monotone = NULL,
-  n.trees = 100, interaction.depth = 1, n.minobsinnode = 10,
-  shrinkage = 0.001, bag.fraction = 0.5, train.fraction = 1,
-  mFeatures = NULL, cv.folds = 0, keep.data = TRUE, verbose = "CV",
-  class.stratify.cv = NULL, n.cores = NULL)
+weights, subset = NULL, offset = NULL, var.monotone = NULL,
+n.trees = 100, interaction.depth = 1, n.minobsinnode = 10,
+shrinkage = 0.001, bag.fraction = 0.5, train.fraction = 1,
+mFeatures = NULL, cv.folds = 0, keep.data = TRUE, verbose = "CV",
+class.stratify.cv = NULL, n.cores = NULL)
+gbm.fit(x, y, offset = NULL, misc = NULL, distribution = "bernoulli",
+w = NULL, var.monotone = NULL, n.trees = 100, interaction.depth = 1,
+n.minobsinnode = 10, shrinkage = 0.001, bag.fraction = 0.5,
+nTrain = NULL, train.fraction = NULL, mFeatures = NULL, keep.data = TRUE,
+verbose = TRUE, var.names = NULL, response.name = "y", group = NULL)
+gbm.more(object, n.new.trees = 100, data = NULL, weights = NULL,
+offset = NULL, verbose = NULL, fold.id = NULL)
 }
 \arguments{
 \item{formula}{a symbolic description of the model to be fit. The formula
@@ -161,6 +168,9 @@ will attempt to send different CV folds off to different cores. If
 documentation for \code{detectCores} makes clear that it is not reliable and
 could return a spurious number of available cores.}
 
+\item{fold.id}{An optional vector of values identifying what fold each
+observation is in. If supplied, cv.folds can be missing.}
+
 \item{nTrain}{An integer representing the number of cases on which to train.
 This is the preferred way of specification for \code{gbm.fit}; The option
 \code{train.fraction} in \code{gbm.fit} is deprecated and only maintained
@@ -170,13 +180,12 @@ both are unspecified, all data is used for training.}
 \item{object}{a \code{gbm} object created from an initial call to
 \code{\link{gbm}}.}
 
-\item{n.new.trees}{the number of additional trees to add to \code{object}.}
+\item{n.new.trees}{the number of additional trees to add to \code{object} using
+\code{gbm.more}.}
 
 \item{x,y}{For \code{gbm.fit}: \code{x} is a data frame or data matrix
 containing the predictor variables and \code{y} is the vector of outcomes.
 The number of rows in \code{x} must be the same as the length of \code{y}.}
-
-\item{offset}{a vector of values for the offset}
 
 \item{misc}{For \code{gbm.fit}: \code{misc} is an R object that is simply
 passed on to the gbm engine. It can be used for additional data for the
