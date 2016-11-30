@@ -9,6 +9,9 @@ gbm.more <- function(object,
    theCall <- match.call()
    nTrain  <- object$nTrain
 
+   shrinkage <- object$shrinkage[length(object$shrinkage)]
+   shrinkage <- rep(shrinkage, n.new.trees)
+
    if (object$distribution$name != "pairwise")
    {
       distribution.call.name <- object$distribution$name
@@ -126,7 +129,6 @@ gbm.more <- function(object,
          {
             stop("Metrics 'map' and 'mrr' require the response to be in {0,1}")
          }
-
          # Cut-off rank for metrics
          # We pass this argument as the last element in the Misc vector
          # Default of 0 means no cutoff
@@ -198,7 +200,7 @@ gbm.more <- function(object,
                     interaction.depth = as.integer(object$interaction.depth),
                     n.minobsinnode = as.integer(object$n.minobsinnode),
                     n.classes = as.integer(object$num.classes),
-                    shrinkage = as.double(object$shrinkage),
+                    shrinkage = as.double(shrinkage),
                     bag.fraction = as.double(object$bag.fraction),
                     train.fraction = as.integer(nTrain), #Should this be as.double(train.fraction)
                     mFeatures = as.integer(object$mFeatures),

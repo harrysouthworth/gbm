@@ -54,7 +54,7 @@ GBMRESULT gbm_setup
     int cLeaves,
     int cMinObsInNode,
     int cNumClasses,
-    double dShrinkage,
+    double *dShrinkage,
     double dBagFraction,
     int cTrain,
     int cFeatures,
@@ -76,7 +76,8 @@ GBMRESULT gbm_transfer_to_R
     double *adErrorReduction,
     double *adWeight,
     double *adPred,
-    int cCatSplitsOld
+    int cCatSplitsOld,
+    double currentShrinkage
 );
 
 

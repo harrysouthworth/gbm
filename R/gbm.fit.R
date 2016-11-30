@@ -53,7 +53,12 @@ gbm.fit <- function(x,y,
    if(is.null(var.names)) {
        var.names <- getVarNames(x)
    }
-
+    
+   if (length(shrinkage) == 1){
+     shrinkage <- rep(shrinkage, n.trees)
+   } else if (length(shrinkage) != n.trees){
+     stop("Shrinkage as a vector must have length n.trees.")
+   }
 #   if(is.null(response.name)) { response.name <- "y" }
 
    # check dataset size
